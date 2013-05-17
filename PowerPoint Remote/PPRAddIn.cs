@@ -53,11 +53,13 @@ namespace PowerPoint_Remote
         #region Public Methods
         public bool StartServer()
         {
+            this.server.Start();
             return this.IsServerRunning();
         }
 
         public bool StopServer()
         {
+            this.server.Stop();
             return this.IsServerRunning();
         }
         #endregion
