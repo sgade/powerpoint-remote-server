@@ -20,6 +20,10 @@ namespace PowerPoint_Remote
         #endregion
 
         private PPRServer server = null;
+        public PPRServer GetServer()
+        {
+            return this.server;
+        }
 
         #region AddIn Events
         /// <summary>
@@ -29,11 +33,21 @@ namespace PowerPoint_Remote
         /// <param name="e">Event arguments.</param>
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             // save our instance
             if ( PPRAddIn.instance == null )
                 PPRAddIn.instance = this;
 
             this.server = new PPRServer();
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = (Exception)e.ExceptionObject;
+            String title = String.Format("{0} - {1}", Constants.NAME, "Unhandled Exception");
+
+            System.Windows.Forms.MessageBox.Show(ex.ToString(), title);
         }
 
         private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
@@ -43,24 +57,15 @@ namespace PowerPoint_Remote
         }
         #endregion
 
-        #region Getters
-        public bool IsServerRunning()
-        {
-            return this.server.isRunning();
-        }
-        #endregion
-
         #region Public Methods
-        public bool StartServer()
+        public void StartServer()
         {
             this.server.Start();
-            return this.IsServerRunning();
         }
 
-        public bool StopServer()
+        public void StopServer()
         {
             this.server.Stop();
-            return this.IsServerRunning();
         }
         #endregion
 

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Office.Tools.Ribbon;
+using PowerPoint_Remote.Server;
 
 namespace PowerPoint_Remote
 {
@@ -15,32 +16,46 @@ namespace PowerPoint_Remote
         private void PPRRibbon_Load(object sender, RibbonUIEventArgs e)
         {
             this.addInInstance = PPRAddIn.GetInstance();
+            PPRServer server = this.addInInstance.GetServer();
+            if ( server != null )
+            {
+                server.Started += server_Started;
+                server.Stopped += server_Stopped;
+            }
 
-            this.SetUIState();
+            this.SetUIState(false);
         }
         #endregion
 
         #region UI Events
         private void buttonStartServer_Click(object sender, RibbonControlEventArgs e)
         {
-            if ( this.addInInstance.StartServer() )
-                this.SetUIState();
+            this.addInInstance.StartServer();
         }
 
         private void buttonStopServer_Click(object sender, RibbonControlEventArgs e)
         {
-            if ( this.addInInstance.StopServer() )
-                this.SetUIState();
+            this.addInInstance.StopServer();
+        }
+        #endregion
+
+        #region Server Events
+        private void server_Started(object sender, EventArgs e)
+        {
+            this.SetUIState(true);
+        }
+
+        private void server_Stopped(object sender, EventArgs e)
+        {
+            this.SetUIState(false);
         }
         #endregion
 
         #region UI Methods
-        private void SetUIState()
+        private void SetUIState(bool isServerRunning)
         {
-            bool serverRunning = this.addInInstance.IsServerRunning();
-
-            this.buttonStartServer.Enabled = !serverRunning;
-            this.buttonStopServer.Enabled = serverRunning;
+            this.buttonStartServer.Enabled = !isServerRunning;
+            this.buttonStopServer.Enabled = isServerRunning;
         }
         #endregion
     }
