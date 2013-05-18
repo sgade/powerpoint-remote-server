@@ -161,7 +161,10 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Server\StartedEventArgs.cs" />
+    <Compile Include="Server\PairingCodeGenerator.cs" />
     <Compile Include="Server\PPRServer.cs" />
+    <Compile Include="Server\ServerAnnouncer.cs" />
     <EmbeddedResource Include="PPRRibbon.resx">
       <DependentUpon>PPRRibbon.cs</DependentUpon>
     </EmbeddedResource>

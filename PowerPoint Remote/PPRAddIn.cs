@@ -44,7 +44,7 @@ namespace PowerPoint_Remote
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Exception ex = (Exception)e.ExceptionObject;
+            Exception ex = (Exception) e.ExceptionObject;
             String title = String.Format("{0} - {1}", Constants.NAME, "Unhandled Exception");
 
             System.Windows.Forms.MessageBox.Show(ex.ToString(), title);
@@ -60,7 +60,8 @@ namespace PowerPoint_Remote
         #region Public Methods
         public void StartServer()
         {
-            this.server.Start();
+            String presentationName = Application.ActivePresentation.Name;
+            this.server.Start(presentationName);
         }
 
         public void StopServer()
@@ -80,7 +81,7 @@ namespace PowerPoint_Remote
             this.Startup += new System.EventHandler(ThisAddIn_Startup);
             this.Shutdown += new System.EventHandler(ThisAddIn_Shutdown);
         }
-        
+
         #endregion
     }
 }

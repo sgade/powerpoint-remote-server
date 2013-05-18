@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using Microsoft.Office.Tools.Ribbon;
 using PowerPoint_Remote.Server;
 
@@ -23,7 +19,7 @@ namespace PowerPoint_Remote
                 server.Stopped += server_Stopped;
             }
 
-            this.SetUIState(false);
+            this.server_Stopped(this, EventArgs.Empty);
         }
         #endregion
 
@@ -40,14 +36,16 @@ namespace PowerPoint_Remote
         #endregion
 
         #region Server Events
-        private void server_Started(object sender, EventArgs e)
+        private void server_Started(object sender, StartedEventArgs e)
         {
             this.SetUIState(true);
+            this.SetPairingCode(e.PairingCode);
         }
 
         private void server_Stopped(object sender, EventArgs e)
         {
             this.SetUIState(false);
+            this.SetPairingCode(null);
         }
         #endregion
 
@@ -56,6 +54,10 @@ namespace PowerPoint_Remote
         {
             this.buttonStartServer.Enabled = !isServerRunning;
             this.buttonStopServer.Enabled = isServerRunning;
+        }
+        private void SetPairingCode(String code)
+        {
+            this.labelPairingCode.Label = code;
         }
         #endregion
     }

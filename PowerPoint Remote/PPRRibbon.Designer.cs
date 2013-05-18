@@ -36,10 +36,10 @@
         {
             this.tab1 = this.Factory.CreateRibbonTab();
             this.group1 = this.Factory.CreateRibbonGroup();
+            this.group2 = this.Factory.CreateRibbonGroup();
+            this.labelPairingCode = this.Factory.CreateRibbonLabel();
             this.buttonStartServer = this.Factory.CreateRibbonButton();
             this.buttonStopServer = this.Factory.CreateRibbonButton();
-            this.group2 = this.Factory.CreateRibbonGroup();
-            this.labelName = this.Factory.CreateRibbonLabel();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -58,6 +58,17 @@
             this.group1.Items.Add(this.buttonStopServer);
             this.group1.Label = "Server";
             this.group1.Name = "group1";
+            // 
+            // group2
+            // 
+            this.group2.Items.Add(this.labelPairingCode);
+            this.group2.Label = "Pairing code";
+            this.group2.Name = "group2";
+            // 
+            // labelPairingCode
+            // 
+            this.labelPairingCode.Label = "000000";
+            this.labelPairingCode.Name = "labelPairingCode";
             // 
             // buttonStartServer
             // 
@@ -82,17 +93,6 @@
             this.buttonStopServer.SuperTip = "Stops the server.";
             this.buttonStopServer.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonStopServer_Click);
             // 
-            // group2
-            // 
-            this.group2.Items.Add(this.labelName);
-            this.group2.Label = "Connected device";
-            this.group2.Name = "group2";
-            // 
-            // labelName
-            // 
-            this.labelName.Label = "No connection";
-            this.labelName.Name = "labelName";
-            // 
             // PPRRibbon
             // 
             this.Name = "PPRRibbon";
@@ -115,7 +115,7 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonStartServer;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonStopServer;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group2;
-        internal Microsoft.Office.Tools.Ribbon.RibbonLabel labelName;
+        internal Microsoft.Office.Tools.Ribbon.RibbonLabel labelPairingCode;
     }
 
     partial class ThisRibbonCollection
