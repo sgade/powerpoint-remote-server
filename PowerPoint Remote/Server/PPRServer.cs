@@ -30,19 +30,20 @@ namespace PowerPoint_Remote.Server
 
         public bool isRunning()
         {
-            return ( this.thread.IsAlive );
+            return ( this.thread != null && this.thread.IsAlive );
         }
 
         public PPRServer()
         {
-            this.thread = new Thread(this.Run);
-            this.thread.Name = "PPRServer";
+            
         }
 
         public void Start()
         {
             if ( !this.isRunning() )
             {
+                this.thread = new Thread(this.Run);
+                this.thread.Name = "PPRServer";
                 this.thread.Start();
             }
         }
@@ -63,8 +64,7 @@ namespace PowerPoint_Remote.Server
             {
                 Thread.Sleep(50000);
             }
-            //catch ( ThreadInterruptedException )
-            catch ( TypeAccessException )
+            catch ( ThreadInterruptedException )
             {
                 // abort, it's okay
             }
