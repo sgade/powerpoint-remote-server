@@ -161,6 +161,7 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Server\MessageID.cs" />
     <Compile Include="Server\StartedEventArgs.cs" />
     <Compile Include="Server\PairingCodeGenerator.cs" />
     <Compile Include="Server\PPRServer.cs" />
