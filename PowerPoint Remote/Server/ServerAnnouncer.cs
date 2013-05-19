@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace PowerPoint_Remote.Server
 {
-    public class ServerAnnouncer
+    public class ServerAnnouncer : IDisposable
     {
         public delegate void BroadcastResponseEventHandler(object sender, EventArgs e);
         public event BroadcastResponseEventHandler BroadcastResponse;
@@ -42,5 +42,24 @@ namespace PowerPoint_Remote.Server
                 this.lastAnnounce = DateTime.Now;
             }
         }
+
+        #region IDisposable
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if ( disposing )
+            {
+                if ( this.client != null )
+                    this.client.Close();
+            }
+        }
+        ~ServerAnnouncer()
+        {
+            this.Dispose(false);
+        }
+        #endregion
     }
 }

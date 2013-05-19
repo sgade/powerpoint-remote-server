@@ -40,7 +40,7 @@
             this.buttonStopServer = this.Factory.CreateRibbonButton();
             this.group2 = this.Factory.CreateRibbonGroup();
             this.labelPairingCode = this.Factory.CreateRibbonLabel();
-            this.buttonCopyCode = this.Factory.CreateRibbonButton();
+            this.buttonCopyCodeToClipboard = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
             this.group1.SuspendLayout();
             this.group2.SuspendLayout();
@@ -86,7 +86,7 @@
             // group2
             // 
             this.group2.Items.Add(this.labelPairingCode);
-            this.group2.Items.Add(this.buttonCopyCode);
+            this.group2.Items.Add(this.buttonCopyCodeToClipboard);
             this.group2.Label = "Pairing code";
             this.group2.Name = "group2";
             // 
@@ -95,12 +95,12 @@
             this.labelPairingCode.Label = "000000";
             this.labelPairingCode.Name = "labelPairingCode";
             // 
-            // buttonCopyCode
+            // buttonCopyCodeToClipboard
             // 
-            this.buttonCopyCode.Label = "Copy to clipboard";
-            this.buttonCopyCode.Name = "buttonCopyCode";
-            this.buttonCopyCode.ShowImage = true;
-            this.buttonCopyCode.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonCopyCode_Click);
+            this.buttonCopyCodeToClipboard.Label = "Copy to clipboard";
+            this.buttonCopyCodeToClipboard.Name = "buttonCopyCodeToClipboard";
+            this.buttonCopyCodeToClipboard.ShowImage = true;
+            this.buttonCopyCodeToClipboard.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonCopyCode_Click);
             // 
             // PPRRibbon
             // 
@@ -125,7 +125,7 @@
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonStopServer;
         internal Microsoft.Office.Tools.Ribbon.RibbonGroup group2;
         internal Microsoft.Office.Tools.Ribbon.RibbonLabel labelPairingCode;
-        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonCopyCode;
+        internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonCopyCodeToClipboard;
     }
 
     partial class ThisRibbonCollection

@@ -12,6 +12,10 @@ namespace PowerPoint_Remote
         #region Ribbon Events
         private void PPRRibbon_Load(object sender, RibbonUIEventArgs e)
         {
+#if !DEBUG
+            this.buttonCopyCodeToClipboard.Visible = false;
+#endif
+
             this.addInInstance = PPRAddIn.GetInstance();
             PPRServer server = this.addInInstance.GetServer();
             if ( server != null )
@@ -64,10 +68,12 @@ namespace PowerPoint_Remote
         }
         private void SetPairingCode(String code)
         {
-            this.labelPairingCode.Label = code;
+            if ( code != null )
+                this.labelPairingCode.Label = code;
+            else
+                this.labelPairingCode.Label = "You need to start the remote server.";
         }
         #endregion
 
-       
     }
 }

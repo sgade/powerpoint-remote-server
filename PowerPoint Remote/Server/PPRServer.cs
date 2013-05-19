@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -29,7 +28,7 @@ namespace PowerPoint_Remote.Server
         }
     }
 
-    public class PPRServer
+    public class PPRServer : IDisposable
     {
         #region Events
         public delegate void StartedEventHandler(object sender, StartedEventArgs e);
@@ -298,6 +297,30 @@ namespace PowerPoint_Remote.Server
             }
 
             return null;
+        }
+        #endregion
+
+        #region IDisposable
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+        protected virtual void Dispose(bool disposing)
+        {
+            if ( disposing )
+            {
+                if ( this.clientSocket != null )
+                    this.clientSocket.Close();
+
+                if ( this.serverSocket != null )
+                    this.serverSocket.Close();
+
+                this.announcer.Dispose();
+            }
+        }
+        ~PPRServer()
+        {
+            this.Dispose(false);
         }
         #endregion
     }
