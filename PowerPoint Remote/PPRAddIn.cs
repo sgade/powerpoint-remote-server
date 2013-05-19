@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.PowerPoint;
@@ -133,8 +134,8 @@ namespace PowerPoint_Remote
                 if ( notes != null )
                     this.server.SendSlideNotes(notes);
 
-                currentSlide.Export("D:\\slide.png", "PNG");
-                
+                byte[] slideData = this.GetSlideByteArray(currentSlide);
+                this.server.SendSlideImageData(slideData);
             }
         }
         private String GetSlideNotes(Slide slide)
@@ -144,6 +145,16 @@ namespace PowerPoint_Remote
             notes = slide.NotesPage.Shapes[2].TextFrame.TextRange.Text;
 
             return notes;
+        }
+        private byte[] GetSlideByteArray(Slide slide)
+        {
+            String filename = Path.GetTempFileName();
+
+            slide.Export(filename, "PNG");
+
+            byte[] buffer = File.ReadAllBytes(filename);
+            File.Delete(filename);
+            return buffer;
         }
         #endregion
 
