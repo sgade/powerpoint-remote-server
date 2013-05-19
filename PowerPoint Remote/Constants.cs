@@ -6,7 +6,7 @@ namespace PowerPoint_Remote
     public abstract class Constants
     {
         public const String NAME = "PowerPoint Remote";
-        public static readonly Encoding ENCODING = Encoding.ASCII;
+        public static readonly Encoding ENCODING = Encoding.UTF8;
 
         public const int SERVER_PORT = 34012;
         public const int SERVER_PAIRINGCODELENGTH = 6;
