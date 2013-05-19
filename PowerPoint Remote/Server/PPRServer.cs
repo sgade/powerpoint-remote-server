@@ -118,19 +118,47 @@ namespace PowerPoint_Remote.Server
         }
         private bool HandleClient()
         {
-            int available = this.serverSocket.Available;
+            int available = this.clientSocket.Available;
             if ( available > 0 )
             {
-                byte[] data = new byte[available];
+                byte[] messageIDBuffer = new byte[1];
+                this.clientSocket.Receive(messageIDBuffer);
+                byte messageID = messageIDBuffer[0];
 
-                this.serverSocket.Receive(data);
+                switch ( messageID )
+                {
+                    case 0: // "Init"
+                        String pairingCode = this.ReceiveString();
 
-                Debug.WriteLine("Recieved: " + Constants.ENCODING.GetString(data));
+                        // TODO Check
+                        Debug.WriteLine(String.Format("Pairing code is '{0}'.", pairingCode));
+                        break;
+                    default:
+                        // unknown
+                        break;
+                }
 
                 return true;
             }
             else
                 return false;
+        }
+
+        private String ReceiveString()
+        {
+            byte[] lengthBuffer = new byte[1];
+            this.clientSocket.Receive(lengthBuffer);
+            int length = lengthBuffer[0];
+
+            if ( length > 0 )
+            {
+                byte[] dataBuffer = new byte[length];
+                this.clientSocket.Receive(dataBuffer);
+
+                return Constants.ENCODING.GetString(dataBuffer);
+            }
+
+            return null;
         }
     }
 }
