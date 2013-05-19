@@ -128,15 +128,17 @@ namespace PowerPoint_Remote
             if ( this.slideShowRunning )
             {
                 Slide currentSlide = Application.ActivePresentation.SlideShowWindow.View.Slide;
-                
-                String notes = this.GetSlideNotes(currentSlide);
-                Debug.WriteLineIf(notes != null, "Notes: " + notes);
-                if ( notes != null )
-                    this.server.SendSlideNotes(notes);
 
-                byte[] slideData = this.GetSlideByteArray(currentSlide);
-                this.server.SendSlideImageData(slideData);
+                this.SendSlideNotes(currentSlide);
+                this.SendSlideImageData(currentSlide);
             }
+        }
+        private void SendSlideNotes(Slide slide)
+        {
+            String notes = this.GetSlideNotes(slide);
+            Debug.WriteLineIf(notes != null, "Notes: " + notes);
+            if ( notes != null )
+                this.server.SendSlideNotes(notes);
         }
         private String GetSlideNotes(Slide slide)
         {
@@ -145,6 +147,11 @@ namespace PowerPoint_Remote
             notes = slide.NotesPage.Shapes[2].TextFrame.TextRange.Text;
 
             return notes;
+        }
+        private void SendSlideImageData(Slide slide)
+        {
+            byte[] slideData = this.GetSlideByteArray(slide);
+            this.server.SendSlideImageData(slideData);
         }
         private byte[] GetSlideByteArray(Slide slide)
         {
