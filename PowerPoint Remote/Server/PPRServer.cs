@@ -101,7 +101,7 @@ namespace PowerPoint_Remote.Server
                 this.serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 this.serverSocket.Bind(new IPEndPoint(IPAddress.Any, Constants.SERVER_PORT));
                 this.serverSocket.Listen(1);
-                this.serverSocket.BeginAccept(this.AcceptClient, this.serverSocket);
+                this.BeginAcceptClient();
 
                 while ( true )
                 {
@@ -120,6 +120,10 @@ namespace PowerPoint_Remote.Server
             }
         }
 
+        private void BeginAcceptClient()
+        {
+            this.serverSocket.BeginAccept(this.AcceptClient, this.serverSocket);
+        }
         private void AcceptClient(IAsyncResult ar)
         {
             if ( ar.IsCompleted && ar.AsyncState != null )
@@ -149,10 +153,15 @@ namespace PowerPoint_Remote.Server
         }
         private bool HandleClient()
         {
-                this.clientSocket.Send(new byte[] { 100 });
-            if ( !this.clientSocket.Connected )
+            try
             {
+                this.clientSocket.Send(new byte[] { 100 });
+            }
+            catch ( SocketException )
+            {
+                // client disconnected
                 this.clientSocket = null;
+                this.BeginAcceptClient();
                 return false;
             }
 
@@ -212,6 +221,12 @@ namespace PowerPoint_Remote.Server
                 return false;
         }
 
+        public void SendSlideNotes(String notes)
+        {
+            this.SendMessageByte(5);
+            this.SendString(notes);
+        }
+
         private void SendMessage(byte messageID)
         {
             this.SendMessageByte(messageID);
@@ -242,6 +257,12 @@ namespace PowerPoint_Remote.Server
             this.clientSocket.Send(data);
         }
 
+        private void SendString(String str)
+        {
+            byte[] strBuffer = Constants.ENCODING.GetBytes(str);
+            this.SendMessageByte((byte) strBuffer.Length);
+            this.SendMessageData(strBuffer);
+        }
         private String ReceiveString()
         {
             byte[] lengthBuffer = new byte[1];

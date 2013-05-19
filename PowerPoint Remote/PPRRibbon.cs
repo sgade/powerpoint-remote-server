@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 using Microsoft.Office.Tools.Ribbon;
 using PowerPoint_Remote.Server;
 
@@ -28,10 +29,16 @@ namespace PowerPoint_Remote
         {
             this.addInInstance.StartServer();
         }
-
         private void buttonStopServer_Click(object sender, RibbonControlEventArgs e)
         {
             this.addInInstance.StopServer();
+        }
+
+        private void buttonCopyCode_Click(object sender, RibbonControlEventArgs e)
+        {
+            String code = this.labelPairingCode.Label;
+
+            Clipboard.SetText(code);
         }
         #endregion
 
@@ -60,5 +67,7 @@ namespace PowerPoint_Remote
             this.labelPairingCode.Label = code;
         }
         #endregion
+
+       
     }
 }

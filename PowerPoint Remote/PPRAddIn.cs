@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Microsoft.Office.Core;
+using Microsoft.Office.Interop.PowerPoint;
 using PowerPoint_Remote.Server;
 
 namespace PowerPoint_Remote
@@ -37,8 +41,10 @@ namespace PowerPoint_Remote
 
             this.server = new PPRServer();
             this.server.ClientRequest += server_ClientRequest;
-            Application.SlideShowNextSlide += Application_SlideShowOnNext;
-            Application.SlideShowOnNext += Application_SlideShowOnNext;
+            // listen to presentation changes
+            Application.SlideShowBegin += Application_SlideShowBegin;
+            Application.SlideShowEnd += Application_SlideShowEnd;
+            Application.SlideShowNextSlide += Application_SlideShowNextSlide;
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -74,37 +80,36 @@ namespace PowerPoint_Remote
                     this.PreviousSlide();
                     break;
             }
-
-            this.SendSlideData();
         }
         #endregion
 
         #region Slide Events & Interaction
-        private void Application_SlideShowOnNext(Microsoft.Office.Interop.PowerPoint.SlideShowWindow Wn)
+        void Application_SlideShowBegin(SlideShowWindow Wn)
         {
-            throw new NotImplementedException();
+            this.slideShowRunning = true;
+        }
+        private void Application_SlideShowEnd(Presentation Pres)
+        {
+            this.slideShowRunning = false;
+        }
+        private void Application_SlideShowNextSlide(Microsoft.Office.Interop.PowerPoint.SlideShowWindow Wn)
+        {
+            // slide changed, send data
+            this.SendSlideData();
         }
 
         private void StartPresentation()
         {
             if ( !this.slideShowRunning )
-            {
-                this.slideShowRunning = true;
-
                 Application.ActivePresentation.SlideShowSettings.Run();
-            }
         }
         private void StopPresentation()
         {
-            // workaround
-            dynamic currentSlide = Application.ActiveWindow.View.Slide;
-            int slideCount = Application.ActivePresentation.Slides.Count;
-            Application.ActiveWindow.View.GotoSlide(slideCount);
-            this.NextSlide();
-            this.NextSlide();
-
-            //throw new NotImplementedException("Stop presentation.");
-            this.slideShowRunning = false;
+            if ( this.slideShowRunning )
+            {
+                // TODO implements
+                throw new NotImplementedException("Method unknown.");
+            }
         }
         private void NextSlide()
         {
@@ -119,7 +124,26 @@ namespace PowerPoint_Remote
 
         private void SendSlideData()
         {
-            // throw new NotImplementedException("Sending slide data to client.");
+            if ( this.slideShowRunning )
+            {
+                Slide currentSlide = Application.ActivePresentation.SlideShowWindow.View.Slide;
+                
+                String notes = this.GetSlideNotes(currentSlide);
+                Debug.WriteLineIf(notes != null, "Notes: " + notes);
+                if ( notes != null )
+                    this.server.SendSlideNotes(notes);
+
+                currentSlide.Export("D:\\slide.png", "PNG");
+                
+            }
+        }
+        private String GetSlideNotes(Slide slide)
+        {
+            String notes = null;
+
+            notes = slide.NotesPage.Shapes[2].TextFrame.TextRange.Text;
+
+            return notes;
         }
         #endregion
 
