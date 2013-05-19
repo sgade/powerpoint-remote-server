@@ -6,6 +6,29 @@ using System.Threading;
 
 namespace PowerPoint_Remote.Server
 {
+    public enum ClientRequest
+    {
+        StartPresentation,
+        StopPresentation,
+
+        NextSlide,
+        PreviousSlide,
+    }
+
+    public class ClientRequestEventArgs : EventArgs
+    {
+        public ClientRequest Request
+        {
+            get;
+            set;
+        }
+
+        public ClientRequestEventArgs(ClientRequest request)
+        {
+            this.Request = request;
+        }
+    }
+
     public class PPRServer
     {
         #region Events
@@ -22,6 +45,14 @@ namespace PowerPoint_Remote.Server
         {
             if ( this.Stopped != null )
                 this.Stopped(this, EventArgs.Empty);
+        }
+
+        public delegate void ClientRequestHandler(object sender, ClientRequestEventArgs e);
+        public event ClientRequestHandler ClientRequest;
+        private void OnClientRequest(ClientRequest request)
+        {
+            if ( this.ClientRequest != null )
+                this.ClientRequest(this, new ClientRequestEventArgs(request));
         }
         #endregion
 
@@ -118,6 +149,13 @@ namespace PowerPoint_Remote.Server
         }
         private bool HandleClient()
         {
+                this.clientSocket.Send(new byte[] { 100 });
+            if ( !this.clientSocket.Connected )
+            {
+                this.clientSocket = null;
+                return false;
+            }
+
             int available = this.clientSocket.Available;
             if ( available > 0 )
             {
@@ -130,9 +168,39 @@ namespace PowerPoint_Remote.Server
                     case 0: // "Init"
                         String pairingCode = this.ReceiveString();
 
-                        // TODO Check
                         Debug.WriteLine(String.Format("Pairing code is '{0}'.", pairingCode));
+
+                        byte accepted = ( this.pairingCode == pairingCode ) ? (byte) 1 : (byte) 0;
+                        this.SendMessage(0, accepted);
+
                         break;
+
+                    case 1: // start
+                    case 2: // stop
+                    case 3: // next
+                    case 4: // prev
+
+                        ClientRequest request = Server.ClientRequest.NextSlide;
+                        switch ( messageID )
+                        {
+                            case 1:
+                                request = Server.ClientRequest.StartPresentation;
+                                break;
+                            case 2:
+                                request = Server.ClientRequest.StopPresentation;
+                                break;
+                            case 3:
+                                request = Server.ClientRequest.NextSlide;
+                                break;
+                            case 4:
+                                request = Server.ClientRequest.PreviousSlide;
+                                break;
+                        }
+
+                        this.OnClientRequest(request);
+
+                        break;
+
                     default:
                         // unknown
                         break;
@@ -142,6 +210,36 @@ namespace PowerPoint_Remote.Server
             }
             else
                 return false;
+        }
+
+        private void SendMessage(byte messageID)
+        {
+            this.SendMessageByte(messageID);
+        }
+        private void SendMessage(byte messageID, byte data)
+        {
+            this.SendMessageByte(messageID);
+            this.SendMessageByte(data);
+        }
+        private void SendMessage(byte messageID, String data)
+        {
+            this.SendMessageByte(messageID);
+
+            if ( data != null )
+            {
+                byte[] dataBuffer = Constants.ENCODING.GetBytes(data);
+                this.SendMessageData(dataBuffer);
+            }
+        }
+        private void SendMessageByte(byte b)
+        {
+            byte[] bBuffer = new byte[1];
+            bBuffer[0] = b;
+            this.SendMessageData(bBuffer);
+        }
+        private void SendMessageData(byte[] data)
+        {
+            this.clientSocket.Send(data);
         }
 
         private String ReceiveString()
