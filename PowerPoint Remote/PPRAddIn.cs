@@ -106,8 +106,7 @@ namespace PowerPoint_Remote
         {
             if ( this.slideShowRunning )
             {
-                // TODO implements
-                throw new NotImplementedException("Method unknown.");
+                Application.Quit(); // REALLY?!
             }
         }
         private void NextSlide()
