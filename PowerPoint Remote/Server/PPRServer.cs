@@ -14,6 +14,19 @@ namespace PowerPoint_Remote.Server
         PreviousSlide,
     }
 
+    public class ClientStatusEventArgs : EventArgs
+    {
+        public bool ClientConnected
+        {
+            get;
+            set;
+        }
+
+        public ClientStatusEventArgs(bool clientConnected)
+        {
+            this.ClientConnected = clientConnected;
+        }
+    }
     public class ClientRequestEventArgs : EventArgs
     {
         public ClientRequest Request
@@ -44,6 +57,16 @@ namespace PowerPoint_Remote.Server
         {
             if ( this.Stopped != null )
                 this.Stopped(this, EventArgs.Empty);
+        }
+
+        public delegate void ClientStatusEventHandler(object sender, ClientStatusEventArgs e);
+        public event ClientStatusEventHandler ClientStatus;
+        private void OnClientStatusChanged(bool clientConnected)
+        {
+            if ( this.ClientStatus != null )
+            {
+                this.ClientStatus(this, new ClientStatusEventArgs(clientConnected));
+            }
         }
 
         public delegate void ClientRequestHandler(object sender, ClientRequestEventArgs e);
@@ -114,6 +137,8 @@ namespace PowerPoint_Remote.Server
             {
                 // abort, it's okay
                 this.serverSocket.Close();
+                if ( this.clientSocket != null )
+                    this.clientSocket.Close();
             }
             finally
             {
@@ -133,12 +158,23 @@ namespace PowerPoint_Remote.Server
                 {
                     Socket serverSocket = (Socket) ar.AsyncState;
                     this.clientSocket = serverSocket.EndAccept(ar);
+
+                    this.OnClientStatusChanged(true);
                 }
                 catch ( ObjectDisposedException )
                 {
                     // ignore, accept was aborted
                 }
             }
+        }
+        
+        private void OnClientDisconnected()
+        {
+            this.clientSocket = null;
+            this.clientAccepted = false;
+
+            this.OnClientStatusChanged(false);
+            this.BeginAcceptClient();
         }
 
         private bool AnnounceOrHandle()
@@ -225,13 +261,6 @@ namespace PowerPoint_Remote.Server
             }
             else
                 return false;
-        }
-
-        private void OnClientDisconnected()
-        {
-            this.clientSocket = null;
-            this.clientAccepted = false;
-            this.BeginAcceptClient();
         }
         #endregion
 

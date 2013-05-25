@@ -22,6 +22,8 @@ namespace PowerPoint_Remote
             {
                 server.Started += server_Started;
                 server.Stopped += server_Stopped;
+
+                server.ClientStatus += server_ClientStatus;
             }
 
             this.server_Stopped(this, EventArgs.Empty);
@@ -41,6 +43,13 @@ namespace PowerPoint_Remote
         private void buttonCopyCode_Click(object sender, RibbonControlEventArgs e)
         {
             String code = this.labelPairingCode.Label;
+            String[] codeParts = code.Split(' ');
+
+            code = "";
+            for ( int i = 0; i < codeParts.Length; i++ )
+            {
+                code += codeParts[i];
+            }
 
             Clipboard.SetText(code);
         }
@@ -58,6 +67,11 @@ namespace PowerPoint_Remote
             this.SetUIState(false);
             this.SetPairingCode(null);
         }
+
+        private void server_ClientStatus(object sender, ClientStatusEventArgs e)
+        {
+            this.SetDeviceConnectionState(e.ClientConnected);
+        }
         #endregion
 
         #region UI Methods
@@ -66,6 +80,7 @@ namespace PowerPoint_Remote
             this.buttonStartServer.Enabled = !isServerRunning;
             this.buttonStopServer.Enabled = isServerRunning;
         }
+        
         private void SetPairingCode(String code)
         {
             if ( code != null )
@@ -80,7 +95,14 @@ namespace PowerPoint_Remote
             else
                 this.labelPairingCode.Label = "You need to start the remote server.";
         }
-        #endregion
 
+        private void SetDeviceConnectionState(bool clientConnected)
+        {
+            if ( clientConnected )
+                this.labelConnectedDevice.Label = "Connected";
+            else
+                this.labelConnectedDevice.Label = "Not connected";
+        }
+        #endregion
     }
 }

@@ -35,30 +35,57 @@
         private void InitializeComponent()
         {
             this.tab1 = this.Factory.CreateRibbonTab();
-            this.group1 = this.Factory.CreateRibbonGroup();
+            this.groupServerControl = this.Factory.CreateRibbonGroup();
+            this.groupPairingCode = this.Factory.CreateRibbonGroup();
+            this.labelPairingCode = this.Factory.CreateRibbonLabel();
+            this.groupConnectedDevice = this.Factory.CreateRibbonGroup();
+            this.labelConnectedDevice = this.Factory.CreateRibbonLabel();
             this.buttonStartServer = this.Factory.CreateRibbonButton();
             this.buttonStopServer = this.Factory.CreateRibbonButton();
-            this.group2 = this.Factory.CreateRibbonGroup();
-            this.labelPairingCode = this.Factory.CreateRibbonLabel();
             this.buttonCopyCodeToClipboard = this.Factory.CreateRibbonButton();
             this.tab1.SuspendLayout();
-            this.group1.SuspendLayout();
-            this.group2.SuspendLayout();
+            this.groupServerControl.SuspendLayout();
+            this.groupPairingCode.SuspendLayout();
+            this.groupConnectedDevice.SuspendLayout();
             // 
             // tab1
             // 
             this.tab1.ControlId.ControlIdType = Microsoft.Office.Tools.Ribbon.RibbonControlIdType.Office;
-            this.tab1.Groups.Add(this.group1);
-            this.tab1.Groups.Add(this.group2);
+            this.tab1.Groups.Add(this.groupServerControl);
+            this.tab1.Groups.Add(this.groupPairingCode);
+            this.tab1.Groups.Add(this.groupConnectedDevice);
             this.tab1.Label = "PowerPoint Remote";
             this.tab1.Name = "tab1";
             // 
-            // group1
+            // groupServerControl
             // 
-            this.group1.Items.Add(this.buttonStartServer);
-            this.group1.Items.Add(this.buttonStopServer);
-            this.group1.Label = "Server";
-            this.group1.Name = "group1";
+            this.groupServerControl.Items.Add(this.buttonStartServer);
+            this.groupServerControl.Items.Add(this.buttonStopServer);
+            this.groupServerControl.Label = "Server";
+            this.groupServerControl.Name = "groupServerControl";
+            // 
+            // groupPairingCode
+            // 
+            this.groupPairingCode.Items.Add(this.labelPairingCode);
+            this.groupPairingCode.Items.Add(this.buttonCopyCodeToClipboard);
+            this.groupPairingCode.Label = "Pairing code";
+            this.groupPairingCode.Name = "groupPairingCode";
+            // 
+            // labelPairingCode
+            // 
+            this.labelPairingCode.Label = "000000";
+            this.labelPairingCode.Name = "labelPairingCode";
+            // 
+            // groupConnectedDevice
+            // 
+            this.groupConnectedDevice.Items.Add(this.labelConnectedDevice);
+            this.groupConnectedDevice.Label = "Connected device";
+            this.groupConnectedDevice.Name = "groupConnectedDevice";
+            // 
+            // labelConnectedDevice
+            // 
+            this.labelConnectedDevice.Label = "Not connected";
+            this.labelConnectedDevice.Name = "labelConnectedDevice";
             // 
             // buttonStartServer
             // 
@@ -83,18 +110,6 @@
             this.buttonStopServer.SuperTip = "Stops the server.";
             this.buttonStopServer.Click += new Microsoft.Office.Tools.Ribbon.RibbonControlEventHandler(this.buttonStopServer_Click);
             // 
-            // group2
-            // 
-            this.group2.Items.Add(this.labelPairingCode);
-            this.group2.Items.Add(this.buttonCopyCodeToClipboard);
-            this.group2.Label = "Pairing code";
-            this.group2.Name = "group2";
-            // 
-            // labelPairingCode
-            // 
-            this.labelPairingCode.Label = "000000";
-            this.labelPairingCode.Name = "labelPairingCode";
-            // 
             // buttonCopyCodeToClipboard
             // 
             this.buttonCopyCodeToClipboard.Label = "Copy to clipboard";
@@ -110,22 +125,26 @@
             this.Load += new Microsoft.Office.Tools.Ribbon.RibbonUIEventHandler(this.PPRRibbon_Load);
             this.tab1.ResumeLayout(false);
             this.tab1.PerformLayout();
-            this.group1.ResumeLayout(false);
-            this.group1.PerformLayout();
-            this.group2.ResumeLayout(false);
-            this.group2.PerformLayout();
+            this.groupServerControl.ResumeLayout(false);
+            this.groupServerControl.PerformLayout();
+            this.groupPairingCode.ResumeLayout(false);
+            this.groupPairingCode.PerformLayout();
+            this.groupConnectedDevice.ResumeLayout(false);
+            this.groupConnectedDevice.PerformLayout();
 
         }
 
         #endregion
 
         internal Microsoft.Office.Tools.Ribbon.RibbonTab tab1;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group1;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupServerControl;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonStartServer;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonStopServer;
-        internal Microsoft.Office.Tools.Ribbon.RibbonGroup group2;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupPairingCode;
         internal Microsoft.Office.Tools.Ribbon.RibbonLabel labelPairingCode;
         internal Microsoft.Office.Tools.Ribbon.RibbonButton buttonCopyCodeToClipboard;
+        internal Microsoft.Office.Tools.Ribbon.RibbonGroup groupConnectedDevice;
+        internal Microsoft.Office.Tools.Ribbon.RibbonLabel labelConnectedDevice;
     }
 
     partial class ThisRibbonCollection
