@@ -311,34 +311,6 @@ namespace PowerPoint_Remote.Server
         #endregion
 
         #region Receive
-        private byte ReceiveByte()
-        {
-            byte[] buffer = new byte[1];
-            this.clientSocket.Receive(buffer);
-
-            return buffer[0];
-        }
-        private int ReceiveInt()
-        {
-            byte[] intBuffer = new byte[32];
-            int retVal = 0;
-
-            for ( int i = 0; i < intBuffer.Length; i++ )
-            {
-                intBuffer[i] = this.ReceiveByte();
-            }
-
-            for ( int i = 0; i < intBuffer.Length; i++ )
-            {
-                if ( intBuffer[i] == 1 )
-                {
-                    retVal += (int)( Math.Pow(2, i) );
-                }
-            }
-
-            return retVal;
-        }
-
         private String ReceiveString()
         {
             int length = this.ReceiveInt();
@@ -352,6 +324,46 @@ namespace PowerPoint_Remote.Server
             }
 
             return null;
+        }
+
+        private int DecodeInt(byte[] intBuffer)
+        {
+            int value = 0;
+
+            for ( int i = 0; i < intBuffer.Length; i++ )
+            {
+                if ( intBuffer[i] == 1 )
+                {
+                    value += (int) ( Math.Pow(2, i) );
+                }
+            }
+
+            return value;
+        }
+        private int ReceiveInt()
+        {
+            byte[] intBuffer = new byte[32];
+
+            for ( int i = 0; i < intBuffer.Length; i++ )
+            {
+                intBuffer[i] = this.ReceiveByte();
+            }
+
+            return this.DecodeInt(intBuffer);
+        }
+        private byte ReceiveByte()
+        {
+            byte[] buffer = this.ReceiveByteData(1);
+
+            return buffer[0];
+        }
+
+        private byte[] ReceiveByteData(int length)
+        {
+            byte[] buffer = new byte[length];
+            this.clientSocket.Receive(buffer, length, SocketFlags.None);
+
+            return buffer;
         }
         #endregion
 
