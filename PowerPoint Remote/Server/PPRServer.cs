@@ -248,6 +248,7 @@ namespace PowerPoint_Remote.Server
         public void SendSlideImageData(byte[] data)
         {
             this.SendMessage(MessageID.Image);
+            this.SendMessageInt(data.Length);
             this.SendMessageData(data);
         }
         #endregion
@@ -355,15 +356,27 @@ namespace PowerPoint_Remote.Server
         {
             byte[] buffer = this.ReceiveByteData(1);
 
-            return buffer[0];
+            if ( buffer.Length >= 1 )
+                return buffer[0];
+            else
+                throw new ArgumentNullException("No data received.");
         }
 
         private byte[] ReceiveByteData(int length)
         {
-            byte[] buffer = new byte[length];
-            this.clientSocket.Receive(buffer, length, SocketFlags.None);
+            try
+            {
+                byte[] buffer = new byte[length];
+                this.clientSocket.Receive(buffer, length, SocketFlags.None);
 
-            return buffer;
+                return buffer;
+            }
+            catch ( SocketException )
+            {
+                // error
+            }
+
+            return new byte[0];
         }
         #endregion
 
