@@ -85,7 +85,7 @@ namespace PowerPoint_Remote
         #endregion
 
         #region Slide Events & Interaction
-        void Application_SlideShowBegin(SlideShowWindow Wn)
+        private void Application_SlideShowBegin(SlideShowWindow Wn)
         {
             this.slideShowRunning = true;
         }

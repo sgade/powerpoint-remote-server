@@ -60,6 +60,7 @@ namespace PowerPoint_Remote.Server
         private ServerAnnouncer announcer = null;
         private String pairingCode = null;
         private Socket clientSocket = null;
+        private bool clientAccepted = false;
 
         public PPRServer()
         {
@@ -155,13 +156,12 @@ namespace PowerPoint_Remote.Server
         {
             try
             {
-                this.clientSocket.Send(new byte[] { 100 });
+                this.SendMessage(MessageID.Ping);
             }
             catch ( SocketException )
             {
                 // client disconnected
-                this.clientSocket = null;
-                this.BeginAcceptClient();
+                this.OnClientDisconnected();
                 return false;
             }
 
@@ -171,51 +171,65 @@ namespace PowerPoint_Remote.Server
                 byte messageIDByte = this.ReceiveByte();
                 MessageID messageID = (MessageID) messageIDByte;
 
-                switch ( messageID )
+                if ( this.clientAccepted )
                 {
-                    case MessageID.Init:
+                    switch ( messageID )
+                    {
+                        case MessageID.Start:
+                        case MessageID.Stop:
+                        case MessageID.Next:
+                        case MessageID.Prev:
+
+                            ClientRequest request = Server.ClientRequest.NextSlide;
+                            switch ( messageID )
+                            {
+                                case MessageID.Start:
+                                    request = Server.ClientRequest.StartPresentation;
+                                    break;
+                                case MessageID.Stop:
+                                    request = Server.ClientRequest.StopPresentation;
+                                    break;
+                                case MessageID.Next:
+                                    request = Server.ClientRequest.NextSlide;
+                                    break;
+                                case MessageID.Prev:
+                                    request = Server.ClientRequest.PreviousSlide;
+                                    break;
+                            }
+
+                            this.OnClientRequest(request);
+
+                            break;
+
+                        default:
+                            // unknown
+                            break;
+                    }
+                }
+                else
+                {
+                    if ( messageID == MessageID.Init )
+                    {
                         String pairingCode = this.ReceiveString();
 
-                        byte accepted = ( this.pairingCode == pairingCode ) ? (byte) 1 : (byte) 0;
+                        this.clientAccepted = ( this.pairingCode == pairingCode );
+                        byte accepted = ( this.clientAccepted ) ? (byte) 1 : (byte) 0;
                         this.SendMessage(MessageID.Init, accepted);
-
-                        break;
-
-                    case MessageID.Start:
-                    case MessageID.Stop:
-                    case MessageID.Next:
-                    case MessageID.Prev:
-
-                        ClientRequest request = Server.ClientRequest.NextSlide;
-                        switch ( messageID )
-                        {
-                            case MessageID.Start:
-                                request = Server.ClientRequest.StartPresentation;
-                                break;
-                            case MessageID.Stop:
-                                request = Server.ClientRequest.StopPresentation;
-                                break;
-                            case MessageID.Next:
-                                request = Server.ClientRequest.NextSlide;
-                                break;
-                            case MessageID.Prev:
-                                request = Server.ClientRequest.PreviousSlide;
-                                break;
-                        }
-
-                        this.OnClientRequest(request);
-
-                        break;
-
-                    default:
-                        // unknown
-                        break;
+                    }
                 }
+                
 
                 return true;
             }
             else
                 return false;
+        }
+
+        private void OnClientDisconnected()
+        {
+            this.clientSocket = null;
+            this.clientAccepted = false;
+            this.BeginAcceptClient();
         }
         #endregion
 
