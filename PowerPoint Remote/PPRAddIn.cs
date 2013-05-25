@@ -146,6 +146,7 @@ namespace PowerPoint_Remote
             String notes = null;
 
             notes = slide.NotesPage.Shapes[2].TextFrame.TextRange.Text;
+            notes = notes.Replace('\r', '\n');
 
             return notes;
         }
