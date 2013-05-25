@@ -92,8 +92,9 @@ namespace PowerPoint_Remote
         private void Application_SlideShowEnd(Presentation Pres)
         {
             this.slideShowRunning = false;
+            this.server.SendStop();
         }
-        private void Application_SlideShowNextSlide(Microsoft.Office.Interop.PowerPoint.SlideShowWindow Wn)
+        private void Application_SlideShowNextSlide(SlideShowWindow Wn)
         {
             // slide changed, send data
             this.SendSlideData();

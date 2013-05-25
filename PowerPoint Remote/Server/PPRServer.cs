@@ -175,6 +175,9 @@ namespace PowerPoint_Remote.Server
                 {
                     switch ( messageID )
                     {
+                        case MessageID.Init:
+                            // not relevant
+                            break;
                         case MessageID.Start:
                         case MessageID.Stop:
                         case MessageID.Next:
@@ -234,6 +237,10 @@ namespace PowerPoint_Remote.Server
         #endregion
 
         #region Public Send Methods
+        public void SendStop()
+        {
+            this.SendMessage(MessageID.Stop);
+        }
         public void SendSlideNotes(String notes)
         {
             this.SendMessage(MessageID.Notes);
@@ -245,7 +252,6 @@ namespace PowerPoint_Remote.Server
             this.SendMessageData(data);
         }
         #endregion
-
         #region Send
         #region HighLevel
         private void SendMessage(MessageID messageID)
