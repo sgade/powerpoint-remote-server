@@ -220,7 +220,6 @@ namespace PowerPoint_Remote.Server
                         this.SendMessage(MessageID.Init, accepted);
                     }
                 }
-                
 
                 return true;
             }
@@ -276,10 +275,28 @@ namespace PowerPoint_Remote.Server
         private void SendString(String str)
         {
             byte[] strBuffer = Constants.ENCODING.GetBytes(str);
-            this.SendMessageByte((byte) strBuffer.Length);
+            this.SendMessageInt(strBuffer.Length);
             this.SendMessageData(strBuffer);
         }
 
+        private byte[] EncodeInt(int value)
+        {
+            byte[] intBuffer = new byte[32];
+
+            for ( int i = 0; i < intBuffer.Length; i++ )
+            {
+                int FLAG = ( 1 << i );
+                bool isSet = ( value & FLAG ) == FLAG;
+                intBuffer[i] = (byte) ( isSet ? 1 : 0 );
+            }
+
+            return intBuffer;
+        }
+        public void SendMessageInt(int value)
+        {
+            byte[] encodedData = this.EncodeInt(value);
+            this.SendMessageData(encodedData);
+        }
         private void SendMessageByte(byte b)
         {
             byte[] bBuffer = new byte[] { b };
@@ -288,7 +305,7 @@ namespace PowerPoint_Remote.Server
 
         private void SendMessageData(byte[] data)
         {
-            this.clientSocket.Send(data);
+            this.clientSocket.Send(data, SocketFlags.None);
         }
         #endregion
         #endregion
