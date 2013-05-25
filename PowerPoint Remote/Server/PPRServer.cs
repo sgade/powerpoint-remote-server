@@ -318,12 +318,30 @@ namespace PowerPoint_Remote.Server
 
             return buffer[0];
         }
+        private int ReceiveInt()
+        {
+            byte[] intBuffer = new byte[32];
+            int retVal = 0;
+
+            for ( int i = 0; i < intBuffer.Length; i++ )
+            {
+                intBuffer[i] = this.ReceiveByte();
+            }
+
+            for ( int i = 0; i < intBuffer.Length; i++ )
+            {
+                if ( intBuffer[i] == 1 )
+                {
+                    retVal += (int)( Math.Pow(2, i) );
+                }
+            }
+
+            return retVal;
+        }
 
         private String ReceiveString()
         {
-            byte[] lengthBuffer = new byte[1];
-            this.clientSocket.Receive(lengthBuffer);
-            int length = lengthBuffer[0];
+            int length = this.ReceiveInt();
 
             if ( length > 0 )
             {
