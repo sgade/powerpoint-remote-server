@@ -137,7 +137,6 @@ namespace PowerPoint_Remote
         private void SendSlideNotes(Slide slide)
         {
             String notes = this.GetSlideNotes(slide);
-            Debug.WriteLineIf(notes != null, "Notes: " + notes);
             if ( notes != null )
                 this.server.SendSlideNotes(notes);
         }

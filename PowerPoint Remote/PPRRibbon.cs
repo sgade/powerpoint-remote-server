@@ -69,7 +69,14 @@ namespace PowerPoint_Remote
         private void SetPairingCode(String code)
         {
             if ( code != null )
-                this.labelPairingCode.Label = code;
+            {
+                String easyReadableCode = "";
+                for ( int i = 0; i < code.Length; i++ )
+                {
+                    easyReadableCode += code[i] + " ";
+                }
+                this.labelPairingCode.Label = easyReadableCode;
+            }
             else
                 this.labelPairingCode.Label = "You need to start the remote server.";
         }
