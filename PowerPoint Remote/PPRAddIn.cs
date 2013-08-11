@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using Microsoft.Office.Interop.PowerPoint;
 using PowerPoint_Remote.Server;
 
@@ -100,24 +101,54 @@ namespace PowerPoint_Remote
         private void StartPresentation()
         {
             if ( !this.slideShowRunning )
-                Application.ActivePresentation.SlideShowSettings.Run();
+            {
+                try
+                {
+                    Application.ActivePresentation.SlideShowSettings.Run();
+                }
+                catch ( COMException )
+                {
+                    // Completely unknown error
+                }
+            }
         }
         private void StopPresentation()
         {
             if ( this.slideShowRunning )
             {
-                Application.Quit(); // REALLY?!
+                try
+                {
+                    Application.Quit(); // REALLY?!
+                }
+                catch ( COMException )
+                {
+                    // Completely unknown error
+                }
             }
         }
         private void NextSlide()
         {
             this.StartPresentation();
-            Application.ActivePresentation.SlideShowWindow.View.Next();
+            try
+            {
+                Application.ActivePresentation.SlideShowWindow.View.Next();
+            }
+            catch ( COMException )
+            {
+                // Completely unknown error
+            }
         }
         private void PreviousSlide()
         {
             this.StartPresentation();
-            Application.ActivePresentation.SlideShowWindow.View.Previous();
+            try
+            {
+                Application.ActivePresentation.SlideShowWindow.View.Previous();
+            }
+            catch ( COMException )
+            {
+                // Completely unknown error
+            }
         }
 
         private void SendSlideData()
