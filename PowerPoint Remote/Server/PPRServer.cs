@@ -190,15 +190,18 @@ namespace PowerPoint_Remote.Server
         }
         private bool HandleClient()
         {
-            try
+            if ( this.clientAccepted )
             {
-                this.SendMessage(MessageID.Ping);
-            }
-            catch ( SocketException )
-            {
-                // client disconnected
-                this.OnClientDisconnected();
-                return false;
+                try
+                {
+                    this.SendMessage(MessageID.Ping);
+                }
+                catch ( SocketException )
+                {
+                    // client disconnected
+                    this.OnClientDisconnected();
+                    return false;
+                }
             }
 
             int available = this.clientSocket.Available;
