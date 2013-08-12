@@ -185,7 +185,7 @@ namespace PowerPoint_Remote
         {
             String filename = Path.GetTempFileName();
 
-            slide.Export(filename, "PNG");
+            slide.Export(filename, Constants.EXPORT_FILETYPE, Constants.EXPORT_WIDTH, Constants.EXPORT_HEIGHT);
 
             byte[] buffer = File.ReadAllBytes(filename);
             File.Delete(filename);
