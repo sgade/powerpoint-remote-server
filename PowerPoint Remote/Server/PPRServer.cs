@@ -138,7 +138,10 @@ namespace PowerPoint_Remote.Server
                 // abort, it's okay
                 this.serverSocket.Close();
                 if ( this.clientSocket != null )
+                {
                     this.clientSocket.Close();
+                    this.clientSocket = null;
+                }
             }
             finally
             {
