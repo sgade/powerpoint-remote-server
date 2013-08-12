@@ -339,7 +339,14 @@ namespace PowerPoint_Remote.Server
         private void SendMessageData(byte[] data)
         {
             if ( this.clientSocket != null )
-                this.clientSocket.Send(data, SocketFlags.None);
+            {
+                int sent = 0;
+
+                while ( sent < data.Length )
+                {
+                    sent += this.clientSocket.Send(data, data.Length - sent, SocketFlags.None);
+                }
+            }
         }
         #endregion
         #endregion
