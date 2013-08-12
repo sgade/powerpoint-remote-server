@@ -340,11 +340,19 @@ namespace PowerPoint_Remote.Server
         {
             if ( this.clientSocket != null )
             {
+                int tries = 0;
                 int sent = 0;
 
                 while ( sent < data.Length )
                 {
                     sent += this.clientSocket.Send(data, data.Length - sent, SocketFlags.None);
+
+                    tries++;
+                }
+
+                if ( tries > 0 )
+                {
+                    Console.WriteLine("Wrote to socket " + tries + " times to send " + sent + " bytes.");
                 }
             }
         }
