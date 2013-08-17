@@ -82,7 +82,11 @@ namespace PowerPoint_Remote
             // format the message box title
             String title = String.Format("{0} - {1}", Constants.NAME, "Unhandled Exception");
 
-            System.Windows.Forms.MessageBox.Show(ex.ToString(), title);
+#if DEBUG
+            System.Windows.Forms.MessageBox.Show(ex.ToString(), title, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Asterisk);
+#else
+            System.Windows.Forms.MessageBox.Show(Constants.CRASH_ERRORTEXT, title, System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+#endif
         }
 
         /// <summary>

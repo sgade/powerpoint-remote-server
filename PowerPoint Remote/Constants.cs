@@ -16,6 +16,11 @@ namespace PowerPoint_Remote
         /// Defualt encoding used in this application.
         /// </summary>
         public static readonly Encoding ENCODING = Encoding.UTF8;
+        public const String CRASH_ERRORTEXT = NAME + " crashed.\n"
+            + "This is not the faul of Power Point itself. We're sorry for the inconvinience.\n"
+            + "Please restart Power Point and continue working.\n"
+            + "\n"
+            + "If this crash occured more often plase contact the developer.";
 
         /// <summary>
         /// The port the server is listening on for clients.
