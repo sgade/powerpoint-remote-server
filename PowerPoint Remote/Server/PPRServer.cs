@@ -107,6 +107,8 @@ namespace PowerPoint_Remote.Server
         {
             if ( !this.isRunning() )
             {
+                if ( this.announcer != null )
+                    this.announcer.Dispose(); // clear resources
                 this.announcer = new ServerAnnouncer(Constants.SERVER_IPRANGE, Constants.SERVER_PORT, presentationName);
 
                 this.thread = new Thread(this.Run);
