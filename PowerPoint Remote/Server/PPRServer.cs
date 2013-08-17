@@ -98,10 +98,6 @@ namespace PowerPoint_Remote.Server
         private Socket clientSocket = null;
         private bool clientAccepted = false;
 
-        public PPRServer()
-        {
-        }
-
         public bool isRunning()
         {
             return ( this.thread != null && this.thread.IsAlive );
