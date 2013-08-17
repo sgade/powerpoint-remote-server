@@ -5,6 +5,9 @@ using System.Threading;
 
 namespace PowerPoint_Remote.Server
 {
+    /// <summary>
+    /// Defines the types of requests the client could make to the server.
+    /// </summary>
     public enum ClientRequest
     {
         StartPresentation,
@@ -14,14 +17,24 @@ namespace PowerPoint_Remote.Server
         PreviousSlide,
     }
 
+    /// <summary>
+    /// Event arguments for when the server was booted up.
+    /// </summary>
     public class StartedEventArgs : EventArgs
     {
+        /// <summary>
+        /// The generated pairing code.
+        /// </summary>
         public String PairingCode
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="pairingCode">The paring code generated during load.</param>
         public StartedEventArgs(String pairingCode)
         {
             this.PairingCode = pairingCode;
@@ -54,6 +67,10 @@ namespace PowerPoint_Remote.Server
         }
     }
 
+    /// <summary>
+    /// Main server class.
+    /// Handles everything related to the remote peer.
+    /// </summary>
     public class PPRServer : IDisposable
     {
         #region Events
@@ -91,44 +108,85 @@ namespace PowerPoint_Remote.Server
         }
         #endregion
 
+        /// <summary>
+        /// Reference to the worker thread that is not killing other application's activity.
+        /// </summary>
         private Thread thread = null;
+        /// <summary>
+        /// The server socket that can accept other connections.
+        /// </summary>
         private Socket serverSocket = null;
+        /// <summary>
+        /// The <code>ServerAnnouncer</code> used to highlight this instance of PPR.
+        /// </summary>
         private ServerAnnouncer announcer = null;
+        /// <summary>
+        /// The pairing code generated on startup.
+        /// </summary>
         private String pairingCode = null;
+        /// <summary>
+        /// The ONE and ONLY client connection (because we only have one at a time) <code>Socket</code>.
+        /// </summary>
         private Socket clientSocket = null;
+        /// <summary>
+        /// Indicates whether the client has already been accepted by us, the server.
+        /// </summary>
         private bool clientAccepted = false;
 
+        /// <summary>
+        /// Returns whether the server is currently running.
+        /// </summary>
+        /// <returns>Whether the server is currently running.</returns>
         public bool isRunning()
         {
+            // thread was created and is still running
             return ( this.thread != null && this.thread.IsAlive );
         }
 
+        /// <summary>
+        /// Start up the server with all its components.
+        /// </summary>
+        /// <param name="presentationName">The name of the current presentation.</param>
         public void Start(String presentationName)
         {
+            // if we are not running already
             if ( !this.isRunning() )
             {
                 if ( this.announcer != null )
                     this.announcer.Dispose(); // clear resources
+                // create the server announcer based on our presentation name
                 this.announcer = new ServerAnnouncer(Constants.SERVER_IPRANGE, Constants.SERVER_PORT, presentationName);
 
+                // create and start new thread
                 this.thread = new Thread(this.Run);
                 this.thread.Name = "PPRServer";
                 this.thread.Start();
             }
         }
+        /// <summary>
+        /// Stops the server and all of its components.
+        /// </summary>
         public void Stop()
         {
+            // if we are in fact running
             if ( this.isRunning() )
             {
+                // interrupt the thread
                 this.thread.Interrupt();
+                // wait for it but at max 1s
                 this.thread.Join(1000);
             }
         }
 
         #region Main Loop
+        /// <summary>
+        /// Main working routine
+        /// </summary>
         private void Run()
         {
+            // generate a new pairing code
             this.pairingCode = PairingCodeGenerator.GenerateCode();
+            // send a new notification to listeners
             this.OnStarted();
 
             try
