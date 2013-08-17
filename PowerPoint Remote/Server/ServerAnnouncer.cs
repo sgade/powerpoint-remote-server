@@ -9,14 +9,6 @@ namespace PowerPoint_Remote.Server
     /// </summary>
     public class ServerAnnouncer : IDisposable
     {
-        public delegate void BroadcastResponseEventHandler(object sender, EventArgs e);
-        public event BroadcastResponseEventHandler BroadcastResponse;
-        private void OnBroadcastResponse()
-        {
-            if ( this.BroadcastResponse != null )
-                this.BroadcastResponse(this, EventArgs.Empty);
-        }
-
         /// <summary>
         /// The <code>UdpClient</code> sending the packets.
         /// </summary>
