@@ -191,20 +191,34 @@ namespace PowerPoint_Remote.Server
 
             try
             {
+                // create the listening server socket
                 this.serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                // bind it to the address
                 this.serverSocket.Bind(new IPEndPoint(IPAddress.Any, Constants.SERVER_PORT));
                 this.serverSocket.Listen(1);
+                // begin async accept routine
                 this.BeginAcceptClient();
 
+                // FOREVER!
                 while ( true )
                 {
+                    // do some work
                     if ( !this.AnnounceOrHandle() )
+                    {
+                        // or else, if 'false' is returned,
+                        // just chill a moment because obviously
+                        // there's nothing to do and we really 
+                        // don't want to waste precious CPU
+                        // time for something like PowerPoint
+                        // right?
                         Thread.Sleep(500);
+                    }
                 }
             }
             catch ( ThreadInterruptedException )
             {
-                // abort, it's okay
+                // aborted, it's okay
+                // but close the sockets properly
                 this.serverSocket.Close();
                 if ( this.clientSocket != null )
                 {
@@ -214,23 +228,35 @@ namespace PowerPoint_Remote.Server
             }
             finally
             {
+                // always send notification
                 this.OnStopped();
             }
         }
 
+        /// <summary>
+        /// Starts the async operation of accepting the client socket by the server socket.
+        /// </summary>
         private void BeginAcceptClient()
         {
             this.serverSocket.BeginAccept(this.AcceptClient, this.serverSocket);
         }
+        /// <summary>
+        /// Callback for when the async Accept of the client was successful.
+        /// </summary>
+        /// <param name="ar">The async result.</param>
         private void AcceptClient(IAsyncResult ar)
         {
+            // if the connect is completed
             if ( ar.IsCompleted && ar.AsyncState != null )
             {
                 try
                 {
+                    // get the server socket
                     Socket serverSocket = (Socket) ar.AsyncState;
+                    // and finally make it accept the client (socket)
                     this.clientSocket = serverSocket.EndAccept(ar);
 
+                    // notify that we now are connected
                     this.OnClientStatusChanged(true);
                 }
                 catch ( ObjectDisposedException )
@@ -240,60 +266,92 @@ namespace PowerPoint_Remote.Server
             }
         }
         
+        /// <summary>
+        /// Clears up all cariables and takes appropriate steps when the client has disconnected.
+        /// </summary>
         private void OnClientDisconnected()
         {
+            // set values
             this.clientSocket = null;
             this.clientAccepted = false;
 
+            // send event
             this.OnClientStatusChanged(false);
+            // accept new client
             this.BeginAcceptClient();
         }
 
+        /// <summary>
+        /// Decides which work is to be done.
+        /// </summary>
+        /// <returns>Whether some time consuming operation was executed or not.</returns>
         private bool AnnounceOrHandle()
         {
+            // if we do not have a client connected
             if ( this.clientSocket == null )
             {
+                // announce ourself
                 this.announcer.Announce();
 
+                // but we really did not operate anything
                 return false;
             }
             else
+            {
+                // because we have a connection, let's handle any data in or out
                 return this.HandleClient();
+            }
         }
+        /// <summary>
+        /// Manages everything related to the client <code>Socket</code>.
+        /// </summary>
+        /// <returns>Whether some time consuming operation was executed or not.</returns>
         private bool HandleClient()
         {
+            // if we have already accepted the client
             if ( this.clientAccepted )
             {
                 try
                 {
+                    // ping it, to check connection
                     this.SendMessage(MessageID.Ping);
                 }
                 catch ( SocketException )
                 {
-                    // client disconnected
+                    // exception, so: client disconnected
+                    // cleanup
                     this.OnClientDisconnected();
-                    return false;
+                    return false; // we didn't do anything
                 }
             }
 
+            // get the available bytes to read
             int available = this.clientSocket.Available;
+            // if we have something waiting for us...
             if ( available > 0 )
             {
+                // receive the first (message) byte
                 byte messageIDByte = this.ReceiveByte();
+                // convert it corresponding to the ENUM
                 MessageID messageID = (MessageID) messageIDByte;
 
                 if ( this.clientAccepted )
                 {
+                    // only if we already have accepted the client,
+                    // these messages are ok
                     switch ( messageID )
                     {
                         case MessageID.Init:
                             // not relevant
                             break;
+
+                        // any state-changing command...
                         case MessageID.Start:
                         case MessageID.Stop:
                         case MessageID.Next:
                         case MessageID.Prev:
 
+                            // .. is to be converted into ClientRequest enum...
                             ClientRequest request = Server.ClientRequest.NextSlide;
                             switch ( messageID )
                             {
@@ -311,6 +369,7 @@ namespace PowerPoint_Remote.Server
                                     break;
                             }
 
+                            // ...and sent to the listeners
                             this.OnClientRequest(request);
 
                             break;
@@ -322,33 +381,50 @@ namespace PowerPoint_Remote.Server
                 }
                 else
                 {
+                    // because the client is not accepted,
+                    // only Init is to be expected
                     if ( messageID == MessageID.Init )
                     {
+                        // get the pairing code from the remote
                         String pairingCode = this.ReceiveString();
 
+                        // check the validity of the code
                         this.clientAccepted = ( this.pairingCode == pairingCode );
+                        // send the init answer to the client
                         byte accepted = ( this.clientAccepted ) ? (byte) 1 : (byte) 0;
                         this.SendMessage(MessageID.Init, accepted);
                     }
                 }
 
+                // we probably did some sending or somethin', so we 'true' out
                 return true;
             }
             else
-                return false;
+                return false; // no data, no computation
         }
         #endregion
 
         #region Public Send Methods
+        /// <summary>
+        /// Sends the 'Stop' command to the client.
+        /// </summary>
         public void SendStop()
         {
             this.SendMessage(MessageID.Stop);
         }
+        /// <summary>
+        /// Sends the notes message to the client.
+        /// </summary>
+        /// <param name="notes">The notes to be sent.</param>
         public void SendSlideNotes(String notes)
         {
             this.SendMessage(MessageID.Notes);
             this.SendString(notes);
         }
+        /// <summary>
+        /// Sends the image message to the client.
+        /// </summary>
+        /// <param name="data">The corresponding image data to be sent.</param>
         public void SendSlideImageData(byte[] data)
         {
             this.SendMessage(MessageID.Image);
@@ -358,73 +434,117 @@ namespace PowerPoint_Remote.Server
         #endregion
         #region Send
         #region HighLevel
+        /// <summary>
+        /// Sends the specified <code>MessageID</code> to the client.
+        /// </summary>
+        /// <param name="messageID">The <code>MessageID</code> to be sent.</param>
         private void SendMessage(MessageID messageID)
         {
+            // convert it to byte
             this.SendMessageByte((byte) messageID);
         }
+        /// <summary>
+        /// Sends the specified <code>MessageID</code> with some additional <code>byte</code> data to the client.
+        /// </summary>
+        /// <param name="messageID">The <code>MessageID</code> to be sent.</param>
+        /// <param name="data">The data to be sent with the message.</param>
         private void SendMessage(MessageID messageID, byte data)
         {
             this.SendMessage(messageID);
             this.SendMessageByte(data);
         }
+        /// <summary>
+        /// Sends the specified <code>MessageID</code> with some additional <code>String</code> data to the client.
+        /// </summary>
+        /// <param name="messageID">The <code>MessageID</code> to be sent.</param>
+        /// <param name="data">The data to be sent with the message.</param>
         private void SendMessage(MessageID messageID, String data)
         {
             this.SendMessage(messageID);
 
+            // first, encode the String
             byte[] dataBuffer = Constants.ENCODING.GetBytes(data);
             this.SendMessageData(dataBuffer);
         }
         #endregion
 
         #region LowLevel
+        /// <summary>
+        /// Sends the specified <code>String</code> according to the protocol to the client.
+        /// </summary>
+        /// <param name="str">The <code>String</code> to be sent.</param>
         private void SendString(String str)
         {
+            // convert to bytes, according to encoding
             byte[] strBuffer = Constants.ENCODING.GetBytes(str);
+            // send int length first
             this.SendMessageInt(strBuffer.Length);
+            // then the raw data itself
             this.SendMessageData(strBuffer);
         }
 
+        /// <summary>
+        /// Encodes the given <code>int</code> value according to the protocol into a <code>byte</code> array.
+        /// </summary>
+        /// <param name="value">The <code>int</code> value to be encoded.</param>
+        /// <returns>The <code>byte</code> array representing "<code>value</code>".</returns>
         private byte[] EncodeInt(int value)
         {
+            // bytes as bit (probably too much)
             byte[] intBuffer = new byte[32];
 
+            // get each bit
             for ( int i = 0; i < intBuffer.Length; i++ )
             {
+                // is the bit set?
                 int FLAG = ( 1 << i );
                 bool isSet = ( value & FLAG ) == FLAG;
+
+                // save into buffer
                 intBuffer[i] = (byte) ( isSet ? 1 : 0 );
             }
 
             return intBuffer;
         }
+        /// <summary>
+        /// Sends an <code>Integer</code> value to the client.
+        /// </summary>
+        /// <param name="value">The <code>int</code> to be sent.</param>
         public void SendMessageInt(int value)
         {
+            // encode the int
             byte[] encodedData = this.EncodeInt(value);
+            // send it as bytes
             this.SendMessageData(encodedData);
         }
+        /// <summary>
+        /// Sends a single <code>byte</code> to the client.
+        /// </summary>
+        /// <param name="b">The <code>byte</code> to be sent.</param>
         private void SendMessageByte(byte b)
         {
+            // wrap the byte in an array
             byte[] bBuffer = new byte[] { b };
             this.SendMessageData(bBuffer);
         }
 
+        /// <summary>
+        /// Sends <code>byte</code>s to the client.
+        /// </summary>
+        /// <param name="data">Raw bytes to be sent.</param>
         private void SendMessageData(byte[] data)
         {
+            // only if a client connection is existant
             if ( this.clientSocket != null )
             {
-                int tries = 0;
+                // bytes already sent
                 int sent = 0;
 
+                // loop for all bytes
                 while ( sent < data.Length )
                 {
+                    // send max number of bytes
                     sent += this.clientSocket.Send(data, data.Length - sent, SocketFlags.None);
-
-                    tries++;
-                }
-
-                if ( tries > 0 )
-                {
-                    Console.WriteLine("Wrote to socket " + tries + " times to send " + sent + " bytes.");
                 }
             }
         }
@@ -432,37 +552,61 @@ namespace PowerPoint_Remote.Server
         #endregion
 
         #region Receive
+        /// <summary>
+        /// Receives a <code>String</code> from the client.
+        /// </summary>
+        /// <returns>The successfully received <code>String</code>.</returns>
         private String ReceiveString()
         {
+            // get the buffer length first
             int length = this.ReceiveInt();
 
+            // if we have some valid data (hopefully)
             if ( length > 0 )
             {
+                // create the buffer
                 byte[] dataBuffer = new byte[length];
+                // and read from the stream
                 this.clientSocket.Receive(dataBuffer);
 
+                // finally, decode the string back from bytes
                 return Constants.ENCODING.GetString(dataBuffer);
             }
 
+            // something went wrong
             return null;
         }
 
+        /// <summary>
+        /// Decodes the given <code>byte</code> array according to the protocol into a <code>int</code> value.
+        /// </summary>
+        /// <param name="intBuffer">The <code>byte</code> array representing the <code>int</code> value.</param>
+        /// <returns>The <code>int</code> value that was decoded.</returns>
         private int DecodeInt(byte[] intBuffer)
         {
+            // the value at the end
             int value = 0;
 
+            // check each register
             for ( int i = 0; i < intBuffer.Length; i++ )
             {
+                // if FLAG is true
                 if ( intBuffer[i] == 1 )
                 {
+                    // calculate bin to int
                     value += (int) ( Math.Pow(2, i) );
                 }
             }
 
             return value;
         }
+        /// <summary>
+        /// Receives an <code>int</code> from the client.
+        /// </summary>
+        /// <returns>The received <code>int</code>.</returns>
         private int ReceiveInt()
         {
+            // receive 32 bytes
             byte[] intBuffer = new byte[32];
 
             for ( int i = 0; i < intBuffer.Length; i++ )
@@ -470,23 +614,37 @@ namespace PowerPoint_Remote.Server
                 intBuffer[i] = this.ReceiveByte();
             }
 
+            // decode the buffer
             return this.DecodeInt(intBuffer);
         }
+        /// <summary>
+        /// Receives a <code>bytes</code> from the client.
+        /// </summary>
+        /// <returns>The <code>bytes</code> received.</returns>
         private byte ReceiveByte()
         {
+            // read a buffer of 1
             byte[] buffer = this.ReceiveByteData(1);
 
+            // if we have something
             if ( buffer.Length >= 1 )
-                return buffer[0];
+                return buffer[0]; // return it
             else
-                throw new ArgumentNullException("No data received.");
+                throw new ArgumentNullException("No data received."); // oh no!
         }
 
+        /// <summary>
+        /// Receives a <code>byte</code> array from the client.
+        /// </summary>
+        /// <param name="length">The length of data to be received</param>
+        /// <returns></returns>
         private byte[] ReceiveByteData(int length)
         {
             try
             {
+                // create buffer
                 byte[] buffer = new byte[length];
+                // read buffer
                 this.clientSocket.Receive(buffer, length, SocketFlags.None);
 
                 return buffer;
@@ -496,10 +654,12 @@ namespace PowerPoint_Remote.Server
                 // error
             }
 
+            // 0 bytes, error but still valid
             return new byte[0];
         }
         #endregion
 
+        // this interface has to be implemented since we are dealing with Socket connections...
         #region IDisposable
         public void Dispose()
         {
