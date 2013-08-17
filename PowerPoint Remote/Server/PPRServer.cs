@@ -14,6 +14,19 @@ namespace PowerPoint_Remote.Server
         PreviousSlide,
     }
 
+    public class StartedEventArgs : EventArgs
+    {
+        public String PairingCode
+        {
+            get;
+            set;
+        }
+
+        public StartedEventArgs(String pairingCode)
+        {
+            this.PairingCode = pairingCode;
+        }
+    }
     public class ClientStatusEventArgs : EventArgs
     {
         public bool ClientConnected
