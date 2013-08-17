@@ -40,27 +40,47 @@ namespace PowerPoint_Remote.Server
             this.PairingCode = pairingCode;
         }
     }
+    /// <summary>
+    /// Event arguments for when the client connection status changed.
+    /// </summary>
     public class ClientStatusEventArgs : EventArgs
     {
+        /// <summary>
+        /// The current client connection status.
+        /// </summary>
         public bool ClientConnected
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="clientConnected">The current client connection status.</param>
         public ClientStatusEventArgs(bool clientConnected)
         {
             this.ClientConnected = clientConnected;
         }
     }
+    /// <summary>
+    /// Event arguments for when the client requested an action for PowerPoint.
+    /// </summary>
     public class ClientRequestEventArgs : EventArgs
     {
+        /// <summary>
+        /// The issued client request.
+        /// </summary>
         public ClientRequest Request
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="request">The issued client request.</param>
         public ClientRequestEventArgs(ClientRequest request)
         {
             this.Request = request;
