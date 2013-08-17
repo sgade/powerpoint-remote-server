@@ -453,19 +453,6 @@ namespace PowerPoint_Remote.Server
             this.SendMessage(messageID);
             this.SendMessageByte(data);
         }
-        /// <summary>
-        /// Sends the specified <code>MessageID</code> with some additional <code>String</code> data to the client.
-        /// </summary>
-        /// <param name="messageID">The <code>MessageID</code> to be sent.</param>
-        /// <param name="data">The data to be sent with the message.</param>
-        private void SendMessage(MessageID messageID, String data)
-        {
-            this.SendMessage(messageID);
-
-            // first, encode the String
-            byte[] dataBuffer = Constants.ENCODING.GetBytes(data);
-            this.SendMessageData(dataBuffer);
-        }
         #endregion
 
         #region LowLevel
