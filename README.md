@@ -8,7 +8,7 @@ The server for [PowerPoint Remote](https://github.com/theporenta/powerpoint-remo
 This is a PowerPoint-AddIn that is required to use the [PowerPoint Remote](https://github.com/theporenta/powerpoint-remote) Android App written by [@theporenta](https://github.com/theporenta).
 It lives inside of PowerPoint itself and usage should be self-explainatory.
 
-The Android App was written independantly from this server. Only the [protocol](https://github.com/sgade/powerpoint-remote-server/blob/master/PowerPoint%20Remote/Server/MessageID.cs) had been agreed upon.
+The Android App was written independently from this server. Only the [protocol](https://github.com/sgade/powerpoint-remote-server/blob/master/PowerPoint%20Remote/Server/MessageID.cs) had been agreed upon.
 
 [**Download**](https://github.com/sgade/powerpoint-remote-server/releases)
 
