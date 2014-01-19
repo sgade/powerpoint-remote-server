@@ -10,7 +10,7 @@ It lives inside of PowerPoint itself and usage should be self-explainatory.
 
 The Android App was written independantly from this server. Only the protocol had been agreed upon.
 
-## [Download](https://github.com/sgade/powerpoint-remote-server/releases)
+[**Download**](https://github.com/sgade/powerpoint-remote-server/releases)
 
 # How to use
 
