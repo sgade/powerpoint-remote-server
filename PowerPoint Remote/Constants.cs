@@ -17,7 +17,7 @@ namespace PowerPoint_Remote
         /// </summary>
         public static readonly Encoding ENCODING = Encoding.UTF8;
         public const String CRASH_ERRORTEXT = NAME + " crashed.\n"
-            + "This is not the faul of Power Point itself. We're sorry for the inconvinience.\n"
+            + "This is not the faul of Power Point itself. We're sorry for the inconvenience.\n"
             + "Please restart Power Point and continue working.\n"
             + "\n"
             + "If this crash occured more often plase contact the developer.";
