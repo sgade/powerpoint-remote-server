@@ -5,7 +5,7 @@ The server for [PowerPoint Remote](https://github.com/theporenta/powerpoint-remo
 
 # What this is
 
-This is a PowerPoint-AddIn that is required to use the [PowerPoint Remote](https://github.com/theporenta/powerpoint-remote) Android App written by [@thePorenta](https://github.com/theporenta).
+This is a PowerPoint-AddIn that is required to use the [PowerPoint Remote](https://github.com/theporenta/powerpoint-remote) Android App written by [@theporenta](https://github.com/theporenta).
 It lives inside of PowerPoint itself and usage should be self-explainatory.
 
 The Android App was written independantly from this server. Only the protocol had been agreed upon.
