@@ -20,7 +20,8 @@ namespace PowerPoint_Remote
             + "This is not the faul of Power Point itself. We're sorry for the inconvenience.\n"
             + "Please restart Power Point and continue working.\n"
             + "\n"
-            + "If this crash occured more often plase contact the developer.";
+            + "If this crash occured multiple times plase contact the developer.\n"
+            + "The best place for that is here: https://github.com/sgade/powerpoint-remote-server.";
 
         /// <summary>
         /// The port the server is listening on for clients.
