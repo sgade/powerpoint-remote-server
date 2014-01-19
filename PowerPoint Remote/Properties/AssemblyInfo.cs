@@ -9,9 +9,9 @@ using System.Security;
 [assembly: AssemblyTitle("PowerPoint Remote")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Sören Gade")]
 [assembly: AssemblyProduct("PowerPoint Remote")]
-[assembly: AssemblyCopyright("Copyright © Sören Gade 2013")]
+[assembly: AssemblyCopyright("Copyright © Sören Gade 2013-2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -33,6 +33,6 @@ using System.Security;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.3.0.1")]
+[assembly: AssemblyFileVersion("0.3.0.1")]
 
